@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Make Purchase Request</title>
+    <meta charset="UTF-8">
+</head>
+<body>
+    <h2>Make Purchase Request</h2>
+    <form th:action="@{/manager/purchase-request}" method="post">
+        <label>Supplier:</label>
+        <select name="supplierId" required>
+            <option th:each="supplier : ${suppliers}" th:value="${supplier.supplierId}" th:text="${supplier.name}"></option>
+        </select>
+        <table border="1">
+            <tr>
+                <th>Select</th>
+                <th>Name</th>
+                <th>Brand</th>
+                <th>Category</th>
+                <th>Price</th>
+                <th>Quantity</th>
+            </tr>
+            <tr th:each="part, iterStat : ${parts}">
+                <td><input type="checkbox" th:name="'partIds'" th:value="${part.partId}"/></td>
+                <td th:text="${part.name}"></td>
+                <td th:text="${part.brand}"></td>
+                <td th:text="${part.category}"></td>
+                <td th:text="${part.price}"></td>
+                <td><input type="number" th:name="'quantities'" min="1" value="1"/></td>
+            </tr>
+        </table>
+        <button type="submit">Submit Request</button>
+    </form>
+    <a th:href="@{/manager/home}">Back to Home</a>
+</body>
+</html>
+
