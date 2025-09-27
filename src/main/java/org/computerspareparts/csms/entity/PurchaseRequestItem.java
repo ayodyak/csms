@@ -1,6 +1,7 @@
 package org.computerspareparts.csms.entity;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import java.math.BigDecimal;
@@ -16,7 +17,17 @@ public class PurchaseRequestItem {
     private Integer quantity;
     private BigDecimal unitPrice;
     private String status;
-    private Integer requestId;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "partId", referencedColumnName = "partId", insertable = false, updatable = false)
+    @JsonIgnore
+    private Part part;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "request_id")
+    @JsonIgnore
+    private PurchaseRequest purchaseRequest;
+
     // Getters and setters
     public Integer getId() { return id; }
     public void setId(Integer id) { this.id = id; }
@@ -36,6 +47,19 @@ public class PurchaseRequestItem {
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
 
-    public Integer getRequestId() { return requestId; }
-    public void setRequestId(Integer requestId) { this.requestId = requestId; }
+    public Part getPart() {
+        return part;
+    }
+
+    public void setPart(Part part) {
+        this.part = part;
+    }
+
+    public PurchaseRequest getPurchaseRequest() {
+        return purchaseRequest;
+    }
+
+    public void setPurchaseRequest(PurchaseRequest purchaseRequest) {
+        this.purchaseRequest = purchaseRequest;
+    }
 }

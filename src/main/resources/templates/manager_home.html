@@ -6,6 +6,18 @@
 </head>
 <body>
     <h2>Welcome, Manager!</h2>
+
+    <div th:if="${lowStockParts != null and !lowStockParts.isEmpty()}">
+        <div style="background-color: #ffcccc; color: #a94442; padding: 10px; border: 1px solid #a94442; margin-bottom: 20px;">
+            <strong>Low Stock Alert!</strong>
+            <ul>
+                <li th:each="part : ${lowStockParts}">
+                    <span th:text="${part.name}"></span> (Stock: <span th:text="${part.stockLevel}"></span>, Reorder Level: <span th:text="${part.reorderLevel}"></span>)
+                </li>
+            </ul>
+        </div>
+    </div>
+
     <ul>
         <li><a th:href="@{/manager/inventory}">View Inventory</a></li>
         <li><a th:href="@{/manager/purchase-request}">Make Purchase Request</a></li>
@@ -13,4 +25,3 @@
     </ul>
 </body>
 </html>
-

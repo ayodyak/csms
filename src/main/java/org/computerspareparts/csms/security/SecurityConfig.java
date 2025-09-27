@@ -35,13 +35,13 @@ public class SecurityConfig {
             .authenticationProvider(authenticationProvider())
             .csrf().disable()
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/login", "/css/**", "/js/**").permitAll()
-                .requestMatchers("/manager/**").hasAuthority("manager")
+                .requestMatchers("/login", "/styles.css", "/script.js").permitAll()
+                .requestMatchers("/index.html", "/", "/api/**").authenticated()
                 .anyRequest().authenticated()
             )
             .formLogin(form -> form
                 .loginPage("/login")
-                .defaultSuccessUrl("/manager/home", true)
+                .defaultSuccessUrl("/index.html", true)
                 .permitAll()
             )
             .logout(logout -> logout.permitAll());
