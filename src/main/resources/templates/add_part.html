@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Add Part</title>
+    <meta charset="UTF-8">
+</head>
+<body>
+    <h2>Add New Part</h2>
+    <form th:action="@{/manager/part/add}" method="post">
+        <label>Name:</label>
+        <input type="text" name="name" required><br>
+        <label>Brand:</label>
+        <input type="text" name="brand" required><br>
+        <label>Category:</label>
+        <input type="text" name="category" required><br>
+        <label>Price:</label>
+        <input type="number" name="price" step="0.01" required><br>
+        <label>Stock Level:</label>
+        <input type="number" name="stockLevel" required><br>
+        <label>Reorder Level:</label>
+        <input type="number" name="reorderLevel" required><br>
+        <button type="submit">Add Part</button>
+    </form>
+    <a th:href="@{/manager/inventory}">Back to Inventory</a>
+</body>
+</html>
+

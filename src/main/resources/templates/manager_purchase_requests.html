@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>My Purchase Requests</title>
+</head>
+<body>
+    <h1>My Purchase Requests</h1>
+    <div th:if="${error}">
+        <p th:text="${error}" style="color:red;"></p>
+    </div>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Request ID</th>
+                <th>Supplier ID</th>
+                <th>Date</th>
+                <th>Status</th>
+                <th>Total Amount</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="request : ${requests}">
+                <td th:text="${request.requestId}"></td>
+                <td th:text="${request.supplierId}"></td>
+                <td th:text="${request.requestDate}"></td>
+                <td th:text="${request.status}"></td>
+                <td th:text="${request.totalAmount}"></td>
+            </tr>
+        </tbody>
+    </table>
+</body>
+</html>
+

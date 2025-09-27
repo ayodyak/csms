@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Manager Login</title>
+    <meta charset="UTF-8">
+</head>
+<body>
+    <h2>Manager Login</h2>
+    <form th:action="@{/login}" method="post">
+        <label for="username">Email:</label>
+        <input type="text" id="username" name="username" required><br>
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password" required><br>
+        <button type="submit">Login</button>
+        <div th:if="${param.error}">
+            <p style="color:red;">Invalid email or password.</p>
+        </div>
+    </form>
+</body>
+</html>
+

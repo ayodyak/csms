@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Manager Home</title>
+    <meta charset="UTF-8">
+</head>
+<body>
+    <h2>Welcome, Manager!</h2>
+    <ul>
+        <li><a th:href="@{/manager/inventory}">View Inventory</a></li>
+        <li><a th:href="@{/manager/purchase-request}">Make Purchase Request</a></li>
+        <li><a th:href="@{/manager/purchase-requests}">Manage Purchase Requests</a></li>
+    </ul>
+</body>
+</html>
+
