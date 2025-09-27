@@ -36,12 +36,12 @@ public class SecurityConfig {
             .csrf().disable()
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/login", "/styles.css", "/script.js").permitAll()
-                .requestMatchers("/index.html", "/", "/api/**").authenticated()
+                .requestMatchers("/manager/home", "/", "/api/**").authenticated()
                 .anyRequest().authenticated()
             )
             .formLogin(form -> form
                 .loginPage("/login")
-                .defaultSuccessUrl("/index.html", true)
+                .defaultSuccessUrl("/manager/home", true)
                 .permitAll()
             )
             .logout(logout -> logout.permitAll());
