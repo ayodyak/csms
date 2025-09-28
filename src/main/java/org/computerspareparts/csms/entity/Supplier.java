@@ -12,6 +12,7 @@ public class Supplier {
     private String contact;
     private String email;
     private String phone;
+    private String password;
 
     // Getters and setters
     public Integer getSupplierId() { return supplierId; }
@@ -28,4 +29,7 @@ public class Supplier {
 
     public String getPhone() { return phone; }
     public void setPhone(String phone) { this.phone = phone; }
+
+    public String getPassword() { return password; }
+    public void setPassword(String password) { this.password = password; }
 }

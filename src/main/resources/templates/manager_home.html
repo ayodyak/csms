@@ -114,6 +114,23 @@
                                 </tr>
                                 </thead>
                                 <tbody id="parts-table-body">
+                                <!-- Each part row gets a data-part-name attribute for JS filtering -->
+                                <tr th:each="part : ${parts}" data-part-name="[[${part.name}]]">
+                                    <td th:text="${part.partId}"></td>
+                                    <td th:text="${part.name}"></td>
+                                    <td th:text="${part.brand}"></td>
+                                    <td th:text="${part.category}"></td>
+                                    <td th:text="${part.price}"></td>
+                                    <td th:text="${part.stockLevel}"></td>
+                                    <td th:text="${part.reorderLevel}"></td>
+                                    <td th:text="${part.status}"></td>
+                                    <td>
+                                        <!-- Actions (edit/delete/view) can go here -->
+                                    </td>
+                                </tr>
+                                <tr id="no-parts-row" style="display:none">
+                                    <td colspan="9">No parts found.</td>
+                                </tr>
                                 </tbody>
                             </table>
                         </div>
@@ -254,6 +271,35 @@
             .catch(() => {
                 window.location.href = '/login';
             });
+    });
+
+    document.addEventListener('DOMContentLoaded', function() {
+        var searchInput = document.getElementById('search-input');
+        var tableBody = document.getElementById('parts-table-body');
+        var noPartsRow = document.getElementById('no-parts-row');
+        searchInput.addEventListener('input', function() {
+            var filter = searchInput.value.trim().toLowerCase();
+            var rows = tableBody.getElementsByTagName('tr');
+            var anyVisible = false;
+            for (var i = 0; i < rows.length; i++) {
+                var row = rows[i];
+                // Skip the 'No parts found' row
+                if (row.id === 'no-parts-row') continue;
+                var nameCell = row.cells[1]; // 2nd column is Name
+                if (nameCell) {
+                    var partName = nameCell.textContent.trim().toLowerCase();
+                    if (!filter || partName.startsWith(filter)) {
+                        row.style.display = '';
+                        anyVisible = true;
+                    } else {
+                        row.style.display = 'none';
+                    }
+                }
+            }
+            if (noPartsRow) {
+                noPartsRow.style.display = anyVisible ? 'none' : '';
+            }
+        });
     });
 </script>
 <div th:if="${param.error}">
