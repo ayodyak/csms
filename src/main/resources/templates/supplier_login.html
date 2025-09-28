@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Supplier Login</title>
+    <style>
+        body {
+            background: #f6f8fa;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .login-container {
+            background: #fff;
+            padding: 2.5rem 2.2rem 2.2rem 2.2rem;
+            border-radius: 18px;
+            box-shadow: 0 4px 32px rgba(0,0,0,0.10);
+            min-width: 320px;
+            max-width: 370px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        h2 {
+            text-align: center;
+            margin-bottom: 1.5rem;
+            color: #222;
+        }
+        label {
+            display: block;
+            margin-bottom: 0.25rem;
+            color: #444;
+            font-size: 1rem;
+        }
+        input[type="text"], input[type="password"] {
+            width: 100%;
+            padding: 0.6rem 0.8rem;
+            margin-bottom: 1.1rem;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 1rem;
+            background: #f9fafb;
+            transition: border 0.2s;
+            box-sizing: border-box;
+        }
+        input[type="text"]:focus, input[type="password"]:focus {
+            border-color: #2563eb;
+            outline: none;
+            background: #fff;
+        }
+        button[type="submit"] {
+            width: 100%;
+            padding: 0.7rem 0;
+            background: #2563eb;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.08rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.2s;
+            margin-top: 0.2rem;
+        }
+        button[type="submit"]:hover {
+            background: #1749b1;
+        }
+        .error-message {
+            color: #d32f2f;
+            background: #fff0f0;
+            border: 1px solid #f8d7da;
+            border-radius: 8px;
+            padding: 0.7rem 1rem;
+            margin-top: 0.5rem;
+            text-align: center;
+            font-size: 0.98rem;
+        }
+    </style>
+</head>
+<body>
+  <div class="login-container">
+    <h2>Supplier Login</h2>
+    <form method="post" action="/supplier/login">
+        <label>Email:</label>
+        <input type="email" name="username" required><br>
+        <label>Password:</label>
+        <input type="password" name="password" required><br>
+        <button type="submit">Login</button>
+        <div th:if="${param.error}">
+            <p class="error-message">Invalid email or password.</p>
+        </div>
+    </form>
+
+  </div>
+</body>
+</html>
+

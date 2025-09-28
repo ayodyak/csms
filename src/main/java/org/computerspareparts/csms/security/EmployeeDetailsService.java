@@ -21,9 +21,8 @@ public class EmployeeDetailsService implements UserDetailsService {
         return org.springframework.security.core.userdetails.User
                 .withUsername(employee.getEmail())
                 .password(employee.getPassword())
-                .authorities(employee.getRole())
+                .authorities("ROLE_" + employee.getRole().toUpperCase())
                 .accountLocked(!employee.getIsActive())
                 .build();
     }
 }
-

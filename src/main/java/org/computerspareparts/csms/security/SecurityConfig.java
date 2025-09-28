@@ -9,6 +9,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 
 @Configuration
 @EnableWebSecurity
@@ -30,18 +31,26 @@ public class SecurityConfig {
     }
 
     @Bean
+    public AuthenticationSuccessHandler customAuthenticationSuccessHandler() {
+        return new RoleBasedAuthenticationSuccessHandler();
+    }
+
+    @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
             .authenticationProvider(authenticationProvider())
-            .csrf().disable()
+            .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/login", "/styles.css", "/script.js").permitAll()
-                .requestMatchers("/manager/home", "/", "/api/**").authenticated()
+                .requestMatchers("/manager/home").hasRole("MANAGER")
+                .requestMatchers("/sales/home").hasRole("SALES_STAFF")
+                .requestMatchers("/it/home").hasRole("IT_TECHNICIAN")
+                .requestMatchers("/accountant/home").hasRole("ACCOUNTANT")
                 .anyRequest().authenticated()
             )
             .formLogin(form -> form
                 .loginPage("/login")
-                .defaultSuccessUrl("/manager/home", true)
+                .successHandler(customAuthenticationSuccessHandler())
                 .permitAll()
             )
             .logout(logout -> logout.permitAll());
