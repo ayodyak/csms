@@ -55,6 +55,21 @@ function fetchAndRenderPurchaseRequests() {
             console.log('Fetched purchase requests:', requests);
             window._purchaseRequests = requests;
             renderPurchaseRequests(requests);
+            // --- Check open requests for manager and update UI ---
+            const managerId = 1; // TODO: Replace with session managerId if available
+            const MAX_OPEN_REQUESTS = 5;
+            const openRequests = requests.filter(r => r.managerId === managerId && r.status && !['COMPLETED', 'REJECTED'].includes(r.status.toUpperCase())).length;
+            const limitMsgDiv = document.getElementById('purchase-request-limit-msg');
+            const newBtn = document.getElementById('new-purchase-request-btn');
+            if (openRequests >= MAX_OPEN_REQUESTS) {
+                limitMsgDiv.textContent = 'Manager has reached the maximum number of open purchase requests.';
+                limitMsgDiv.style.display = 'block';
+                newBtn.disabled = true;
+            } else {
+                limitMsgDiv.textContent = '';
+                limitMsgDiv.style.display = 'none';
+                newBtn.disabled = false;
+            }
         })
         .catch(err => {
             purchaseRequestsList.innerHTML = `<p style="color:red;">Error loading requests: ${err.message}</p>`;
@@ -383,9 +398,17 @@ function handlePurchaseFormSubmit() {
         if (!res.ok) return res.text().then(text => { throw new Error(text); });
         closePurchaseModal();
         fetchAndRenderPurchaseRequests();
+        // Clear any previous limit message
+        document.getElementById('purchase-request-limit-msg').style.display = 'none';
+        document.getElementById('purchase-request-limit-msg').textContent = '';
     })
     .catch(err => {
-        alert('Failed to create purchase request: ' + err.message);
+        const limitMsgDiv = document.getElementById('purchase-request-limit-msg');
+        limitMsgDiv.textContent = err.message;
+        limitMsgDiv.style.display = 'block';
+        if (err.message.includes('maximum number of open purchase requests')) {
+            document.getElementById('new-purchase-request-btn').disabled = true;
+        }
     });
 }
 

@@ -14,4 +14,7 @@ public interface PurchaseRequestRepository extends JpaRepository<PurchaseRequest
     List<PurchaseRequest> findByManagerIdWithItemsAndParts(@Param("managerId") Integer managerId);
 
     long countByManagerIdAndRequestDateBetween(Integer managerId, java.time.LocalDateTime start, java.time.LocalDateTime end);
+
+    @Query("SELECT COUNT(pr) FROM PurchaseRequest pr WHERE pr.managerId = :managerId AND pr.status NOT IN ('COMPLETED', 'REJECTED')")
+    long countOpenRequestsByManagerId(@Param("managerId") Integer managerId);
 }

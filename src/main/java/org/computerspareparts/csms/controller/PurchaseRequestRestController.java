@@ -4,6 +4,8 @@ import org.computerspareparts.csms.entity.PurchaseRequest;
 import org.computerspareparts.csms.entity.PurchaseRequestItem;
 import org.computerspareparts.csms.repository.PurchaseRequestRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -21,7 +23,15 @@ public class PurchaseRequestRestController {
     }
 
     @PostMapping
-    public PurchaseRequest createRequest(@RequestBody PurchaseRequest request) {
+    public ResponseEntity<?> createRequest(@RequestBody PurchaseRequest request) {
+        final int MAX_OPEN_REQUESTS = 5; // Set your desired limit here
+        if (request.getManagerId() == null) {
+            return ResponseEntity.badRequest().body("Manager ID is required.");
+        }
+        long openRequests = purchaseRequestRepository.countOpenRequestsByManagerId(request.getManagerId());
+        if (openRequests >= MAX_OPEN_REQUESTS) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Manager has reached the maximum number of open purchase requests.");
+        }
         request.setRequestId(null);
         if (request.getItems() != null) {
             for (PurchaseRequestItem item : request.getItems()) {
@@ -30,7 +40,7 @@ public class PurchaseRequestRestController {
         } else {
             request.setItems(new ArrayList<>());
         }
-        return purchaseRequestRepository.save(request);
+        return ResponseEntity.ok(purchaseRequestRepository.save(request));
     }
 
     @PutMapping("/{id}/status")
