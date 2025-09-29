@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Finance Report</title>
+</head>
+<body>
+<h1>Finance Report</h1>
+<p>Total Sales: <span th:text="${totalSales}"></span></p>
+
+<a href="/finance/invoices/new">➕ Add New Invoice</a>
+
+<table border="1">
+    <tr>
+        <th>ID</th><th>Customer</th><th>Amount</th><th>Date</th><th>Status</th><th>Actions</th>
+    </tr>
+    <tr th:each="invoice : ${invoices}">
+        <td th:text="${invoice.id}"></td>
+        <td th:text="${invoice.customerName}"></td>
+        <td th:text="${invoice.amount}"></td>
+        <td th:text="${invoice.date}"></td>
+        <td th:text="${invoice.status}"></td>
+        <td>
+            <a th:href="@{'/finance/invoices/edit/' + ${invoice.id}}">✏️ Edit</a> |
+            <a th:href="@{'/finance/invoices/delete/' + ${invoice.id}}">🗑 Delete</a>
+        </td>
+    </tr>
+</table>
+</body>
+</html>
+
