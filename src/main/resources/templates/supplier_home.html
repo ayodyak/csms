@@ -1,11 +1,163 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Supplier Home</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Supplier Portal - Computer Store</title>
+    <link rel="stylesheet" href="/supplier.css">
 </head>
 <body>
-    <h1>Welcome, Supplier!</h1>
-    <p>This is your home page.</p>
+<div class="app-container">
+    <!-- Header -->
+    <div class="header">
+        <div class="header-content">
+            <div class="header-left">
+                <h2 class="header-title">Supplier Portal</h2>
+                <div class="supplier-badge">
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+                        <circle cx="9" cy="7" r="4"/>
+                        <path d="M22 21v-2a4 4 0 0 0-3-3.87"/>
+                        <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                    </svg>
+                    <span id="supplier-name">TechDistributor Inc.</span>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="container">
+            <!-- Stats Header -->
+            <div class="stats-header">
+                <div class="stat-badge stat-secondary">
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+                    </svg>
+                    <span id="parts-count">4 Parts Available</span>
+                </div>
+                <div class="stat-badge" id="pending-badge" style="display: none;">
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"/>
+                        <polyline points="12,6 12,12 16,14"/>
+                    </svg>
+                    <span id="pending-count">0 Pending Reviews</span>
+                </div>
+                <div class="stat-badge stat-ready" id="ready-badge" style="display: none;">
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                        <path d="M21 10.5a9 9 0 1 1-6.49-8.686"/>
+                        <polyline points="13,5 21,5 21,13"/>
+                    </svg>
+                    <span id="ready-count">1 Ready to Ship</span>
+                </div>
+            </div>
+
+            <!-- Tabs -->
+            <div class="tabs">
+                <div class="tab-buttons">
+                    <button class="tab-button active" onclick="switchTab('requests')">Purchase Requests</button>
+                    <button class="tab-button" onclick="switchTab('inventory')">My Inventory</button>
+                </div>
+
+                <!-- Purchase Requests Tab -->
+                <div id="requests-tab" class="tab-content active">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Purchase Requests</h3>
+                            <p class="card-description">Review and respond to purchase requests from the store manager</p>
+                        </div>
+                        <div class="card-content">
+                            <div id="requests-list" class="requests-list">
+                                <!-- Requests will be populated by JavaScript -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Inventory Tab -->
+                <div id="inventory-tab" class="tab-content">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Supplier Inventory</h3>
+                            <div class="search-container">
+                                <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="11" cy="11" r="8"/>
+                                    <path d="M21 21l-4.35-4.35"/>
+                                </svg>
+                                <input type="text" id="inventory-search" placeholder="Search your parts inventory..." class="search-input">
+                            </div>
+                        </div>
+                        <div class="card-content">
+                            <div class="table-container">
+                                <table class="table">
+                                    <thead>
+                                    <tr>
+                                        <th>Part ID</th>
+                                        <th>Name</th>
+                                        <th>Brand</th>
+                                        <th>Category</th>
+                                        <th>Price</th>
+                                        <th>Available Stock</th>
+                                        <th>Status</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody id="inventory-table-body">
+                                    <!-- Inventory will be populated by JavaScript -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delivery Modal -->
+<div id="delivery-modal" class="modal-overlay">
+    <div class="modal">
+        <div class="modal-header">
+            <h3 class="modal-title">Schedule Delivery</h3>
+            <p class="modal-description" id="modal-description">Part Name - Quantity: 0</p>
+        </div>
+        <div class="modal-content">
+            <form id="delivery-form">
+                <div class="form-group">
+                    <label for="delivery-date">Delivery Date</label>
+                    <input type="date" id="delivery-date" class="form-input" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="delivery-time">Delivery Time</label>
+                    <input type="time" id="delivery-time" class="form-input" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="delivered-quantity">Quantity to Deliver</label>
+                    <input type="number" id="delivered-quantity" class="form-input" min="1" required>
+                    <p class="form-hint" id="quantity-hint">Requested: 0 | Available: ✓</p>
+                </div>
+
+                <div class="form-group">
+                    <label for="tracking-number">Tracking Number (Optional)</label>
+                    <input type="text" id="tracking-number" class="form-input" placeholder="Enter tracking number">
+                </div>
+
+
+
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-outline" onclick="closeDeliveryModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Schedule Delivery</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script src="/supplier.js"></script>
 </body>
 </html>
-
