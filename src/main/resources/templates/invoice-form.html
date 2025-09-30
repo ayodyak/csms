@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Invoice Form</title>
+</head>
+<body>
+<h1>Invoice Form</h1>
+
+<form th:action="@{${invoice.id != null} ? '/finance/invoices/update/' + ${invoice.id} : '/finance/invoices'}"
+      th:object="${invoice}" method="post">
+
+    <label>Customer Name:</label>
+    <input type="text" th:field="*{customerName}" /><br/>
+
+    <label>Amount:</label>
+    <input type="number" step="0.01" th:field="*{amount}" /><br/>
+
+    <label>Date:</label>
+    <input type="date" th:field="*{date}" /><br/>
+
+    <label>Status:</label>
+    <select th:field="*{status}">
+        <option value="Paid">Paid</option>
+        <option value="Pending">Pending</option>
+        <option value="Cancelled">Cancelled</option>
+    </select><br/>
+
+    <button type="submit">Save</button>
+</form>
+
+<a href="/finance/invoices">⬅ Back to Report</a>
+</body>
+</html>
