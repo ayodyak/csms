@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Deliveries</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
+    <style>
+        .container { max-width: 1100px; margin: 2rem auto; }
+        table { width: 100%; }
+        th, td { white-space: nowrap; }
+    </style>
+    <script>
+        async function fetchJSON(url, options){
+            const res = await fetch(url, options);
+            if(!res.ok) throw new Error(await res.text());
+            return res.json();
+        }
+
+        function createRowHtml(d){
+            return `
+                <td>${d.purchaseRequest?.requestId ?? ''}</td>
+                <td>${d.supplier?.supplierId ?? ''}</td>
+                <td>${d.purchaseRequest?.quantity ?? ''}</td>
+                <td>${d.deliveryDate ?? ''}</td>
+                <td>${d.deliveryTime ?? ''}</td>
+                <td>${d.address ?? ''}</td>
+                <td>$${d.cost ?? '0.00'}</td>
+                <td><span class="status">${d.status ?? ''}</span></td>
+                <td>
+                    <button class="secondary" data-update="${d.deliveryId}">Update</button>
+                    <button class="contrast" data-delete="${d.deliveryId}">Delete</button>
+                </td>
+            `;
+        }
+
+        function wireRowActions(tbody){
+            tbody.querySelectorAll('[data-update]').forEach(a => a.addEventListener('click', async (e) => {
+                e.preventDefault();
+                const id = a.getAttribute('data-update');
+                const address = prompt('Address:');
+                const date = prompt('Date (YYYY-MM-DD):');
+                const time = prompt('Time (HH:MM):');
+                const cost = Number(prompt('Cost:', '0') || '0');
+                const status = prompt('Status (Scheduled/Delivered/Cancelled):');
+                try{
+                    await fetchJSON(`/api/suppliers/deliveries/${id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ address, deliveryDate: date, deliveryTime: time, cost, status }) });
+                    await loadDeliveries();
+                }catch(e){ document.getElementById('msg').textContent = `Error: ${e.message || e}`; }
+            }));
+            tbody.querySelectorAll('[data-delete]').forEach(a => a.addEventListener('click', async (e) => {
+                e.preventDefault();
+                const id = a.getAttribute('data-delete');
+                try{
+                    await fetch(`/api/suppliers/deliveries/${id}`, { method: 'DELETE' });
+                    await loadDeliveries();
+                }catch(e){ document.getElementById('msg').textContent = `Error: ${e.message || e}`; }
+            }));
+        }
+
+        function renderTable(rows){
+            console.log('Rendering table with', rows.length, 'deliveries');
+            const tbody = document.querySelector('#deliveries-tbody');
+            tbody.innerHTML = '';
+            rows.forEach(d => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = createRowHtml(d);
+                tbody.appendChild(tr);
+            });
+            wireRowActions(tbody);
+        }
+
+        async function loadDeliveries(){
+            document.getElementById('msg').textContent = 'Loading...';
+            try{
+                console.log('Loading deliveries...');
+                const data = await fetchJSON(`/api/suppliers/deliveries`);
+                console.log('Received deliveries:', data);
+                renderTable(data);
+                document.getElementById('msg').textContent = `Loaded ${data.length} deliveries`;
+            }catch(e){
+                console.error('Error loading deliveries:', e);
+                document.getElementById('msg').textContent = `Error: ${e.message || e}`;
+            }
+        }
+
+        async function loadAvailableData(){
+            try{
+                // Load available requests
+                const requests = await fetchJSON('/api/suppliers/requests');
+                const requestIds = requests.slice(0, 5).map(r => r.requestId).join(', ');
+                document.getElementById('availableRequests').textContent = `Sample IDs: ${requestIds}`;
+                
+                // Load available suppliers
+                const suppliers = await fetchJSON('/api/suppliers');
+                const supplierIds = suppliers.slice(0, 3).map(s => s.supplierId).join(', ');
+                document.getElementById('availableSuppliers').textContent = `Sample IDs: ${supplierIds}`;
+            }catch(e){
+                document.getElementById('availableRequests').textContent = 'Error loading requests';
+                document.getElementById('availableSuppliers').textContent = 'Error loading suppliers';
+            }
+        }
+
+        async function createDelivery(){
+            console.log('Creating delivery...');
+            const body = {
+                purchaseRequest: { requestId: Number(document.getElementById('d_requestId').value) },
+                supplier: { supplierId: Number(document.getElementById('d_supplierId').value) },
+                deliveryDate: document.getElementById('d_date').value || null,
+                deliveryTime: document.getElementById('d_time').value || null,
+                address: document.getElementById('d_address').value,
+                cost: Number(document.getElementById('d_cost').value || 0),
+                status: document.getElementById('d_status').value || 'Scheduled'
+            };
+            console.log('Request body:', body);
+            if (!body.purchaseRequest.requestId || isNaN(body.purchaseRequest.requestId)) {
+                document.getElementById('msg').textContent = 'Error: Request ID is required and must be a number';
+                alert('Request ID is required and must be a number');
+                return;
+            }
+            if (!body.supplier.supplierId || isNaN(body.supplier.supplierId)) {
+                document.getElementById('msg').textContent = 'Error: Supplier ID is required and must be a number';
+                alert('Supplier ID is required and must be a number');
+                return;
+            }
+            document.getElementById('msg').textContent = 'Creating...';
+            try{
+                // pre-validate existence to avoid 400s
+                await fetchJSON(`/api/suppliers/requests/${body.purchaseRequest.requestId}`);
+                await fetchJSON(`/api/suppliers/${body.supplier.supplierId}`);
+                const d = await fetchJSON('/api/suppliers/deliveries', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+                document.getElementById('msg').textContent = `Created delivery ${d.deliveryId}`;
+                // clear create form
+                ['d_requestId','d_supplierId','d_address','d_date','d_time','d_cost','d_status'].forEach(id => {
+                    const el = document.getElementById(id);
+                    if(el) el.value = '';
+                });
+                // append the new row immediately
+                const tbody = document.querySelector('#deliveries-tbody');
+                const tr = document.createElement('tr');
+                tr.innerHTML = createRowHtml(d);
+                tbody.prepend(tr);
+                wireRowActions(tbody);
+            }catch(e){
+                document.getElementById('msg').textContent = `Error: ${e.message || e}`;
+                alert(document.getElementById('msg').textContent + '\nTip: ensure the Request ID and Supplier ID exist.');
+            }
+        }
+
+        async function updateDelivery(){
+            const id = document.getElementById('ud_deliveryId').value;
+            const body = {
+                deliveryDate: document.getElementById('ud_date').value || null,
+                deliveryTime: document.getElementById('ud_time').value || null,
+                address: document.getElementById('ud_address').value,
+                cost: Number(document.getElementById('ud_cost').value || 0),
+                status: document.getElementById('ud_status').value
+            };
+            if(!id){
+                document.getElementById('msg').textContent = 'Enter delivery ID to update.';
+                return;
+            }
+            document.getElementById('msg').textContent = 'Updating...';
+            try{
+                await fetchJSON(`/api/suppliers/deliveries/${id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+                document.getElementById('msg').textContent = 'Updated.';
+                loadDeliveries();
+            }catch(e){
+                document.getElementById('msg').textContent = `Error: ${e.message || e}`;
+            }
+        }
+
+        async function deleteDelivery(){
+            const id = document.getElementById('dd_deliveryId').value;
+            if(!id){
+                document.getElementById('msg').textContent = 'Enter delivery ID to delete.';
+                return;
+            }
+            document.getElementById('msg').textContent = 'Deleting...';
+            try{
+                await fetch(`/api/suppliers/deliveries/${id}`, { method: 'DELETE' });
+                document.getElementById('msg').textContent = 'Deleted.';
+                loadDeliveries();
+            }catch(e){
+                document.getElementById('msg').textContent = `Error: ${e.message || e}`;
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('btnList').addEventListener('click', loadDeliveries);
+            document.getElementById('btnCreate').addEventListener('click', createDelivery);
+            loadDeliveries();
+            loadAvailableData();
+        });
+    </script>
+</head>
+<body>
+<main class="container">
+    <nav>
+        <ul>
+            <li><a href="/home.html">Home</a></li>
+            <li><a href="/requests.html">Requests</a></li>
+            <li><strong>Deliveries</strong></li>
+            <li><a href="/payments.html">Payments</a></li>
+        </ul>
+    </nav>
+
+    <h2>Deliveries</h2>
+
+    <article>
+        <h4>Create Delivery</h4>
+        <div class="grid">
+            <div>
+                <label for="d_requestId">Request ID *</label>
+                <input id="d_requestId" placeholder="Enter Request ID (e.g., 50)" required>
+            </div>
+            <div>
+                <label for="d_supplierId">Supplier ID *</label>
+                <input id="d_supplierId" placeholder="Enter Supplier ID (e.g., 42)" required>
+            </div>
+            <div>
+                <label for="d_address">Address *</label>
+                <input id="d_address" placeholder="Enter delivery address" required>
+            </div>
+        </div>
+        <div class="grid">
+            <div>
+                <label for="d_date">Delivery Date</label>
+                <input id="d_date" type="date" placeholder="Date">
+            </div>
+            <div>
+                <label for="d_time">Delivery Time</label>
+                <input id="d_time" type="time" placeholder="Time">
+            </div>
+            <div>
+                <label for="d_cost">Cost</label>
+                <input id="d_cost" type="number" step="0.01" placeholder="0.00">
+            </div>
+            <div>
+                <label for="d_status">Status</label>
+                <select id="d_status">
+                    <option value="Scheduled">Scheduled</option>
+                    <option value="Delivered">Delivered</option>
+                    <option value="Cancelled">Cancelled</option>
+                </select>
+            </div>
+        </div>
+        <button id="btnCreate" class="primary">Create Delivery</button>
+    </article>
+
+    <article>
+        <h4>Available Data</h4>
+        <div class="grid">
+            <div>
+                <h5>Available Request IDs:</h5>
+                <p id="availableRequests">Loading...</p>
+            </div>
+            <div>
+                <h5>Available Supplier IDs:</h5>
+                <p id="availableSuppliers">Loading...</p>
+            </div>
+        </div>
+        <button id="btnList" class="secondary">Refresh Deliveries</button>
+    </article>
+
+    <article>
+        <h4>Deliveries Table</h4>
+        <div class="overflow-auto">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Request ID</th><th>Supplier ID</th><th>Quantity</th><th>Date</th><th>Time</th><th>Address</th><th>Cost</th><th>Status</th><th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="deliveries-tbody"></tbody>
+            </table>
+        </div>
+    </article>
+
+    
+
+    <p id="msg"></p>
+</main>
+</body>
+</html>
+
+

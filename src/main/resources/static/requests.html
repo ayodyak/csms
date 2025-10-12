@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Requests</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
+    <style>
+        .container { max-width: 1100px; margin: 2rem auto; }
+        table { width: 100%; }
+        th, td { white-space: nowrap; }
+        td.wrap { white-space: normal; }
+    </style>
+    <script>
+        async function fetchJSON(url, options){
+            const res = await fetch(url, options);
+            if(!res.ok) throw new Error(await res.text());
+            return res.json();
+        }
+
+        function renderTable(rows){
+            const tbody = document.querySelector('#requests-tbody');
+            tbody.innerHTML = '';
+            rows.forEach(r => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${r.productId ?? ''}</td>
+                    <td>${r.supplierId ?? ''}</td>
+                    <td>${r.quantity ?? ''}</td>
+                    <td>
+                        <span class="status">${r.status ?? ''}</span>
+                    </td>
+                    <td>
+                        <button class="secondary" data-accept="${r.requestId}">Accept</button>
+                        <button class="contrast" data-delete="${r.requestId}">Delete</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            // wire actions
+            tbody.querySelectorAll('[data-accept]').forEach(btn => btn.addEventListener('click', async () => {
+                const id = btn.getAttribute('data-accept');
+                try{
+                    await fetchJSON(`/api/suppliers/requests/${id}/status?status=Accepted`, { method: 'PUT' });
+                    document.getElementById('msg').textContent = `Request ${id} accepted! Redirecting to deliveries...`;
+                    setTimeout(() => {
+                        window.location.href = '/deliveries.html';
+                    }, 1500);
+                }catch(e){ document.getElementById('msg').textContent = `Error: ${e.message || e}`; }
+            }));
+            tbody.querySelectorAll('[data-delete]').forEach(btn => btn.addEventListener('click', async () => {
+                const id = btn.getAttribute('data-delete');
+                try{
+                    await fetch(`/api/suppliers/requests/${id}`, { method: 'DELETE' });
+                    loadRequests();
+                }catch(e){ document.getElementById('msg').textContent = `Error: ${e.message || e}`; }
+            }));
+        }
+
+        async function loadRequests(){
+            document.getElementById('msg').textContent = 'Loading...';
+            try{
+                const data = await fetchJSON(`/api/suppliers/requests`);
+                console.log('Loaded requests:', data); // Debug log
+                renderTable(data);
+                document.getElementById('msg').textContent = `Loaded ${data.length} requests`;
+            }catch(e){
+                console.error('Error loading requests:', e); // Debug log
+                document.getElementById('msg').textContent = `Error: ${e.message || e}`;
+            }
+        }
+
+        async function updateStatus(){
+            const id = document.getElementById('rs_requestId').value;
+            const status = document.getElementById('rs_status').value;
+            if(!id || !status){
+                document.getElementById('msg').textContent = 'Enter request ID and new status.';
+                return;
+            }
+            document.getElementById('msg').textContent = 'Updating status...';
+            try{
+                await fetchJSON(`/api/suppliers/requests/${id}/status?status=${encodeURIComponent(status)}`, { method: 'PUT' });
+                document.getElementById('msg').textContent = 'Updated.';
+                loadRequests();
+            }catch(e){
+                document.getElementById('msg').textContent = `Error: ${e.message || e}`;
+            }
+        }
+
+        async function deleteRequest(){
+            const id = document.getElementById('dr_requestId').value;
+            if(!id){
+                document.getElementById('msg').textContent = 'Enter request ID to delete.';
+                return;
+            }
+            document.getElementById('msg').textContent = 'Deleting...';
+            try{
+                await fetch(`/api/suppliers/requests/${id}`, { method: 'DELETE' });
+                document.getElementById('msg').textContent = 'Deleted.';
+                loadRequests();
+            }catch(e){
+                document.getElementById('msg').textContent = `Error: ${e.message || e}`;
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            loadRequests();
+        });
+    </script>
+</head>
+<body>
+<main class="container">
+    <nav>
+        <ul>
+            <li><a href="/home.html">Home</a></li>
+            <li><strong>Requests</strong></li>
+            <li><a href="/deliveries.html">Deliveries</a></li>
+            <li><a href="/payments.html">Payments</a></li>
+        </ul>
+    </nav>
+
+    <h2>Requests</h2>
+    <div class="overflow-auto">
+        <table>
+            <thead>
+                <tr>
+                    <th>Product ID</th><th>Supplier ID</th><th>Quantity</th><th>Status</th><th></th>
+                </tr>
+            </thead>
+            <tbody id="requests-tbody"></tbody>
+        </table>
+    </div>
+
+    <p id="msg"></p>
+</main>
+</body>
+</html>
+
+

@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Payments</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
+    <style>
+        .container { max-width: 1100px; margin: 2rem auto; }
+        table { width: 100%; }
+        th, td { white-space: nowrap; }
+    </style>
+    <script>
+        async function fetchJSON(url, options){
+            const res = await fetch(url, options);
+            if(!res.ok) throw new Error(await res.text());
+            return res.json();
+        }
+
+        function renderTable(rows){
+            const tbody = document.querySelector('#payments-tbody');
+            tbody.innerHTML = '';
+            console.log('Rendering', rows.length, 'payments');
+            rows.forEach(p => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${p.purchaseRequest?.requestId ?? ''}</td>
+                    <td>${p.supplier?.supplierId ?? ''}</td>
+                    <td>$${p.amount ?? '0.00'}</td>
+                    <td>${p.paymentDate ?? ''}</td>
+                    <td><span class="status">${p.status ?? ''}</span></td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        async function loadPayments(){
+            document.getElementById('msg').textContent = 'Loading...';
+            try{
+                console.log('Fetching payments data...');
+                const data = await fetchJSON('/api/suppliers/payments');
+                console.log('Received data:', data);
+                renderTable(data);
+                document.getElementById('msg').textContent = `Loaded ${data.length} payments.`;
+            }catch(e){
+                console.error('Error loading payments:', e);
+                document.getElementById('msg').textContent = `Error: ${e.message || e}`;
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            loadPayments();
+        });
+    </script>
+</head>
+<body>
+<main class="container">
+    <nav>
+        <ul>
+            <li><a href="/home.html">Home</a></li>
+            <li><a href="/requests.html">Requests</a></li>
+            <li><a href="/deliveries.html">Deliveries</a></li>
+            <li><strong>Payments</strong></li>
+        </ul>
+    </nav>
+
+    <h2>Payments</h2>
+    <article>
+        <div class="overflow-auto">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Request ID</th><th>Supplier ID</th><th>Amount</th><th>Payment Date</th><th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="payments-tbody"></tbody>
+            </table>
+        </div>
+    </article>
+
+
+    <p id="msg"></p>
+</main>
+</body>
+</html>
+
+

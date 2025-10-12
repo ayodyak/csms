@@ -1,10 +1,118 @@
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>hey</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Supplier Portal</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
+    <style>
+        .container { max-width: 980px; margin: 2rem auto; }
+        pre { white-space: pre-wrap; }
+        nav ul { gap: .5rem; }
+        details > summary { cursor: pointer; }
+    </style>
+    <script>
+        async function fetchJSON(url, options) {
+            const res = await fetch(url, options);
+            if (!res.ok) throw new Error(await res.text());
+            return res.json();
+        }
+        function onError(err){
+            const p = document.getElementById('success');
+            if(p) p.textContent = `Error: ${err.message || err}`;
+        }
+        // ---------------- Supplier Create ----------------
+        async function createSupplier(){
+            const body = {
+                name: document.getElementById('name').value,
+                email: document.getElementById('email').value,
+                contactNo: document.getElementById('contact').value,
+                address: document.getElementById('address').value,
+                passwordHash: document.getElementById('password').value
+            };
+            try{
+                const data = await fetchJSON('/api/suppliers', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+                const form = document.getElementById('supplier-form');
+                if(form) form.reset();
+                document.getElementById('success').textContent = `Supplier ${data.name} created successfully.`;
+            }catch(e){
+                document.getElementById('success').textContent = e.message || 'Failed to create supplier';
+            }
+        }
+        // Initialize
+        window.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('button[data-action]').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const fn = btn.getAttribute('data-action');
+                    if (typeof window[fn] === 'function') {
+                        window[fn]().catch(onError);
+                    }
+                });
+            });
+        });
+    </script>
 </head>
 <body>
-<h1>Hey YO!fgfgfgf</h1>
+<main class="container">
+    <h1>Supplier Portal</h1>
+
+    <nav>
+        <ul>
+            <li><a href="#suppliers">Suppliers</a></li>
+            <li><a href="/requests.html">Requests</a></li>
+            <li><a href="/deliveries.html">Deliveries</a></li>
+            <li><a href="/payments.html">Payments</a></li>
+        </ul>
+    </nav>
+
+    <article id="suppliers">
+        <h3>Supplier Create</h3>
+        <form id="supplier-form" onsubmit="return false;">
+            <div class="grid">
+                <input id="name" placeholder="Name" required>
+                <input id="email" placeholder="Email" required>
+                <input id="contact" placeholder="Contact No" required>
+            </div>
+            <div class="grid">
+                <input id="address" placeholder="Address" required>
+                <input id="password" placeholder="Password Hash" required>
+            </div>
+            <button data-action="createSupplier">Create</button>
+            <p id="success"></p>
+        </form>
+    </article>
+
+    <!-- The separate UIs for Requests, Deliveries and Payments now live in
+         /requests.html, /deliveries.html and /payments.html respectively. -->
+
+    
+</main>
 </body>
 </html>
