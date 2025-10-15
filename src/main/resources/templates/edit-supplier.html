@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Edit Supplier</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" th:href="@{/css/styles.css}" />
+    <style>
+        body { background: #f4f6f8; }
+        .main-card { max-width: 600px; margin: 40px auto; padding: 30px; background: #fff; border-radius: 10px; box-shadow: 0 2px 12px #ccc; }
+        .card-header { background: #007bff; color: #fff; border-radius: 8px 8px 0 0; }
+        .form-group label { font-weight: 500; }
+        .btn { margin-right: 4px; }
+        .back-link { margin-top: 20px; display: block; }
+    </style>
+</head>
+<body>
+    <div class="main-card">
+        <div class="card">
+            <div class="card-header">
+                <h2 class="mb-0">Edit Supplier</h2>
+            </div>
+            <div class="card-body">
+                <form th:action="${supplier.id} != null ? '/supplier/edit/' + ${supplier.id} : '/supplier'" th:object="${supplier}" method="post">
+                    <div class="form-group">
+                        <label for="name">Name:</label>
+                        <input type="text" id="name" th:field="*{name}" class="form-control" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="contact">Contact:</label>
+                        <input type="text" id="contact" th:field="*{contact}" class="form-control" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email:</label>
+                        <input type="email" id="email" th:field="*{email}" class="form-control" />
+                    </div>
+                    <div class="form-group">
+                        <label for="address">Address:</label>
+                        <input type="text" id="address" th:field="*{address}" class="form-control" />
+                    </div>
+                    <button type="submit" class="btn btn-success">Update Supplier</button>
+                </form>
+                <a href="/supplier" class="btn btn-link back-link">Back to Supplier List</a>
+            </div>
+        </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

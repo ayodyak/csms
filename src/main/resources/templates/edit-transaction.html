@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Edit Transaction</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" th:href="@{/css/styles.css}" />
+    <style>
+        body { background: #f4f6f8; }
+        .main-card { max-width: 600px; margin: 40px auto; padding: 30px; background: #fff; border-radius: 10px; box-shadow: 0 2px 12px #ccc; }
+        .card-header { background: #007bff; color: #fff; border-radius: 8px 8px 0 0; }
+        .form-group label { font-weight: 500; }
+        .btn { margin-right: 4px; }
+        .back-link { margin-top: 20px; display: block; }
+    </style>
+</head>
+<body>
+    <div class="main-card">
+        <div class="card">
+            <div class="card-header">
+                <h2 class="mb-0">Edit Sales Transaction</h2>
+            </div>
+            <div class="card-body">
+                <form th:action="${transaction.id} != null ? '/transactions/edit/' + ${transaction.id} : '/transactions'" th:object="${transaction}" method="post">
+                    <div class="form-group">
+                        <label for="customerName">Customer Name:</label>
+                        <input type="text" id="customerName" th:field="*{customerName}" class="form-control" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="itemDetails">Item Details:</label>
+                        <input type="text" id="itemDetails" th:field="*{itemDetails}" class="form-control" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="partType">Part Type:</label>
+                        <input type="text" id="partType" th:field="*{partType}" class="form-control" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="amount">Amount:</label>
+                        <input type="number" id="amount" th:field="*{amount}" class="form-control" step="0.01" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="paymentMethod">Payment Method:</label>
+                        <select id="paymentMethod" th:field="*{paymentMethod}" class="form-control" required>
+                            <option value="">Select Payment Method</option>
+                            <option value="CASH">Cash</option>
+                            <option value="CARD">Card</option>
+                            <option value="UPI">UPI</option>
+                            <option value="BANK_TRANSFER">Bank Transfer</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="status">Status:</label>
+                        <input type="text" id="status" th:field="*{status}" class="form-control" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="transactionDate">Date:</label>
+                        <input type="datetime-local" id="transactionDate" th:field="*{transactionDate}" class="form-control" required />
+                    </div>
+                    <button type="submit" class="btn btn-success">Update Transaction</button>
+                </form>
+                <a href="/transactions" class="btn btn-link back-link">Back to Transactions</a>
+            </div>
+        </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

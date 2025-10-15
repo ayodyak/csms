@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sale Details - Computer Spare Parts</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <h1>Parts Sale Details</h1>
+            <div class="nav-links">
+                <a th:href="@{/}" class="btn">New Sale</a>
+                <a th:href="@{/dashboard}" class="btn">Dashboard</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="card">
+            <h2>Sale Information</h2>
+            <div class="details-grid">
+                <div class="detail-item">
+                    <label>Transaction ID:</label>
+                    <span th:text="${transaction.id}"></span>
+                </div>
+                <div class="detail-item">
+                    <label>Date:</label>
+                    <span th:text="${#temporals.format(transaction.transactionDate, 'dd-MM-yyyy HH:mm')}"></span>
+                </div>
+                <div class="detail-item">
+                    <label>Customer Name:</label>
+                    <span th:text="${transaction.customerName}"></span>
+                </div>
+                <div class="detail-item">
+                    <label>Parts Details:</label>
+                    <span th:text="${transaction.itemDetails}"></span>
+                </div>
+                <div class="detail-item">
+                    <label>Category:</label>
+                    <span th:text="${transaction.partType}"></span>
+                </div>
+                <div class="detail-item">
+                    <label>Amount:</label>
+                    <span th:text="${'₹' + #numbers.formatDecimal(transaction.amount, 1, 2)}"></span>
+                </div>
+                <div class="detail-item">
+                    <label>Payment Method:</label>
+                    <span th:text="${transaction.paymentMethod}"></span>
+                </div>
+                <div class="detail-item">
+                    <label>Notes:</label>
+                    <span th:text="${transaction.notes}"></span>
+                </div>
+            </div>
+
+            <div class="actions">
+                <a th:href="@{/transaction/edit/{id}(id=${transaction.id})}" class="btn">Edit</a>
+                <form th:action="@{/transaction/delete/{id}(id=${transaction.id})}" method="post" style="display: inline;">
+                    <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this sale?')">Delete</button>
+                </form>
+                <a th:href="@{/}" class="btn">Back</a>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .details-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        .detail-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        .detail-item label {
+            font-weight: bold;
+            color: #555;
+        }
+        .actions {
+            margin-top: 20px;
+            padding: 20px;
+            border-top: 1px solid #eee;
+        }
+    </style>
+</body>
+</html>

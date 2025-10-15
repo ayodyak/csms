@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSMS Dashboard</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/css/styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-dark">
+    <div class="container">
+        <a class="navbar-brand" href="/">Computer Spare Parts Management</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item active">
+                    <a class="nav-link" href="/dashboard"><i class="fas fa-home"></i> Dashboard</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/suppliers"><i class="fas fa-truck"></i> Suppliers</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/transactions"><i class="fas fa-exchange-alt"></i> Transactions</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/reports"><i class="fas fa-chart-bar"></i> Reports</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="container mt-4">
+    <div class="row fade-in">
+        <div class="col-md-4">
+            <div class="dashboard-card">
+                <i class="fas fa-dollar-sign fa-2x mb-2"></i>
+                <h3 th:text="${totalSales}">$0</h3>
+                <p>Total Sales</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="dashboard-card">
+                <i class="fas fa-shopping-cart fa-2x mb-2"></i>
+                <h3 th:text="${totalTransactions}">0</h3>
+                <p>Total Transactions</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="dashboard-card">
+                <i class="fas fa-users fa-2x mb-2"></i>
+                <h3 th:text="${totalSuppliers}">0</h3>
+                <p>Active Suppliers</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Recent Transactions</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Date</th>
+                                <th>Amount</th>
+                                <th>Status</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr th:each="transaction : ${recentTransactions}">
+                                <td th:text="${transaction.id}"></td>
+                                <td th:text="${#dates.format(transaction.date, 'dd-MM-yyyy')}"></td>
+                                <td th:text="${'$' + transaction.amount}"></td>
+                                <td>
+                                    <span class="badge badge-success" th:text="${transaction.status}"></span>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Quick Actions</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <a href="/index" class="btn btn-primary btn-block mb-2">
+                            <i class="fas fa-cash-register"></i> New Sale
+                        </a>
+                        <a href="/transactions/new" class="btn btn-primary btn-block mb-2">
+                            <i class="fas fa-plus"></i> Edit Sales Transaction
+                        </a>
+                        <a href="/suppliers/new" class="btn btn-primary btn-block mb-2">
+                            <i class="fas fa-user-plus"></i> Edit Supplier Details
+                        </a>
+                        <a href="/reports" class="btn btn-primary btn-block mb-2">
+                            <i class="fas fa-file-alt"></i> Generate Report
+                        </a>
+                        <a href="/supplier-payments" class="btn btn-primary btn-block mb-2">
+                            <i class="fas fa-money-check-alt"></i> Supplier Payments
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Sales Overview</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="salesChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.min.js"></script>
+<script src="/js/scripts.js"></script>
+</body>
+</html>

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Transactions</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" th:href="@{/css/styles.css}" />
+    <style>
+        .container { max-width: 900px; margin: 30px auto; padding: 20px; background: #f9f9f9; border-radius: 8px; box-shadow: 0 2px 8px #ccc; }
+        h1 { margin-bottom: 24px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 16px; }
+        th, td { padding: 10px; border: 1px solid #ddd; text-align: left; }
+        th { background: #f0f0f0; }
+        tr:nth-child(even) { background: #f7f7f7; }
+        tr:hover { background: #e6f7ff; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="d-flex justify-content-end mb-3">
+            <a href="/dashboard" class="btn btn-primary">Dashboard</a>
+        </div>
+        <h1>Sales Transactions</h1>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Item Details</th>
+                    <th>Part Type</th>
+                    <th>Status</th>
+                    <th>Date</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="transaction : ${transactions}">
+                    <td th:text="${transaction.id}"></td>
+                    <td th:text="${transaction.itemDetails}"></td>
+                    <td th:text="${transaction.partType}"></td>
+                    <td th:text="${transaction.status}"></td>
+                    <td th:text="${transaction.transactionDate}"></td>
+                    <td>
+                        <a th:href="@{'/transactions/edit/' + ${transaction.id}}" class="btn btn-sm btn-primary">Edit</a>
+                        <form th:action="@{'/transactions/delete/' + ${transaction.id}}" method="post" style="display:inline;">
+                            <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this transaction?');">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>
