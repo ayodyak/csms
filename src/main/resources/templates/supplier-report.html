@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Supplier Payments</title>
+</head>
+<body>
+<h1>Supplier Payments</h1>
+<p>Total Expenses: <span th:text="${totalExpenses}"></span></p>
+
+<a href="/finance/payments/new">➕ Add New Payment</a>
+
+<table border="1">
+    <tr>
+        <th>ID</th><th>Supplier</th><th>Amount</th><th>Date</th><th>Status</th><th>Actions</th>
+    </tr>
+    <tr th:each="payment : ${payments}">
+        <td th:text="${payment.id}"></td>
+        <td th:text="${payment.supplierName}"></td>
+        <td th:text="${payment.paymentAmount}"></td>
+        <td th:text="${payment.paymentDate}"></td>
+        <td th:text="${payment.status}"></td>
+        <td>
+            <a th:href="@{/finance/payments/edit/{id}(id=${payment.id})}">✏️ Edit</a> |
+            <a th:href="@{/finance/payments/delete/{id}(id=${payment.id})}">🗑 Delete</a>
+        </td>
+    </tr>
+</table>
+
+<a href="/finance/invoices">⬅ Back to Invoices</a>
+</body>
+</html>

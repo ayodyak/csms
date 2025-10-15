@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Finance Dashboard</title>
+</head>
+<body>
+<h1>Finance Dashboard</h1>
+
+<h2>Summary</h2>
+<p>Total Sales: <span th:text="${totalSales}"></span></p>
+<p>Total Expenses: <span th:text="${totalExpenses}"></span></p>
+<p><b>Net Profit: <span th:text="${netProfit}"></span></b></p>
+
+<h3>Quick Links</h3>
+<ul>
+    <li><a href="/finance/invoices">📄 Manage Invoices</a></li>
+    <li><a href="/finance/payments">💰 Manage Supplier Payments</a></li>
+</ul>
+</body>
+</html>
