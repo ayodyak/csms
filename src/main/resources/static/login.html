@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login | Computer Spare Parts System</title>
+    <style>
+        body {
+            background: linear-gradient(135deg, #1f4037, #99f2c8);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: Arial, sans-serif;
+        }
+        .login-container {
+            background: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0px 6px 15px rgba(0,0,0,0.25);
+            width: 100%;
+            max-width: 400px;
+        }
+        h1 { text-align: center; margin-bottom: 20px; }
+        input, button {
+            width: 100%; padding: 12px; margin: 8px 0;
+            border-radius: 8px; border: 1px solid #ccc;
+            font-size: 15px;
+        }
+        button {
+            background: #0d1b2a; color: white; font-size: 16px;
+            cursor: pointer; border: none;
+        }
+        button:hover { background: #1b263b; }
+        .success { color: green; text-align: center; }
+        .error { color: red; text-align: center; }
+        .links { text-align: center; margin-top: 10px; }
+        .links a { color: #0d1b2a; text-decoration: none; }
+    </style>
+</head>
+<body>
+<div class="login-container">
+    <h1>🔑 Login</h1>
+    <form id="loginForm">
+        <input type="email" name="email" placeholder="Enter Email" required>
+        <input type="password" name="password" placeholder="Enter Password" required>
+        <button type="submit">Login</button>
+    </form>
+    <p id="message"></p>
+    <div class="links">
+        <p>Don't have an account? <a href="register.html">Register here</a></p>
+        <p><a href="index.html">⬅ Back to Home</a></p>
+    </div>
+</div>
+
+<script>
+    const form = document.getElementById("loginForm");
+    form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const formData = new FormData(form);
+        const params = new URLSearchParams(formData);
+
+        try {
+            const response = await fetch("/api/login", {
+                method: "POST",
+                body: params,
+                credentials: "include" // ✅ keep session cookie
+            });
+
+            const msg = document.getElementById("message");
+            const text = await response.text();
+
+            if (response.ok) {
+                msg.textContent = "✅ Login Successful!";
+                msg.className = "success";
+
+                // ✅ Save user email in localStorage (frontend state)
+                localStorage.setItem("loggedInUser", formData.get("email"));
+
+                // Redirect after login
+                setTimeout(() => window.location.href = "products.html", 1500);
+            } else {
+                msg.textContent = "❌ " + text;
+                msg.className = "error";
+            }
+        } catch (err) {
+            alert("Error: " + err);
+        }
+    });
+</script>
+</body>
+</html>

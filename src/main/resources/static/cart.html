@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shopping Cart | Computer Spare Parts System</title>
+    <style>
+        body {
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            background: #f5f7fa;
+            color: #333;
+        }
+
+        nav {
+            background: #0d1b2a;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 30px;
+            box-shadow: 0px 4px 8px rgba(0,0,0,0.2);
+        }
+
+        nav .logo {
+            font-size: 22px;
+            font-weight: bold;
+            color: #fff;
+        }
+
+        nav ul {
+            list-style: none;
+            display: flex;
+            gap: 20px;
+        }
+
+        nav ul li a {
+            text-decoration: none;
+            color: #f1f1f1;
+            padding: 8px 16px;
+            border-radius: 5px;
+            transition: 0.3s ease;
+        }
+
+        nav ul li a:hover {
+            background: #1b263b;
+            color: #ffd60a;
+        }
+
+        .cart-container {
+            padding: 40px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: #fff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0px 4px 12px rgba(0,0,0,0.1);
+        }
+
+        th, td {
+            padding: 15px;
+            text-align: center;
+        }
+
+        th {
+            background: #0d1b2a;
+            color: #fff;
+        }
+
+        .remove-btn {
+            background: #e63946;
+            color: #fff;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .checkout {
+            margin-top: 20px;
+            text-align: right;
+        }
+
+        .checkout button {
+            background: #0d1b2a;
+            color: #fff;
+            padding: 12px 25px;
+            font-size: 18px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+<nav>
+    <div class="logo">💻 Spare Parts System</div>
+    <ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="products.html">View Products</a></li>
+        <li><a href="login.html">Login</a></li>
+        <li><a href="register.html">Register</a></li>
+    </ul>
+</nav>
+
+<div class="cart-container">
+    <h1>Your Shopping Cart</h1>
+    <table id="cart-table">
+        <tr>
+            <th>Product</th>
+            <th>Price</th>
+            <th>Quantity</th>
+            <th>Subtotal</th>
+            <th>Action</th>
+        </tr>
+    </table>
+
+    <div class="checkout">
+        <h2 id="total">Total: $0</h2>
+        <button>Proceed to Checkout</button>
+    </div>
+</div>
+
+<script>
+    // ✅ Load cart data from backend (database)
+    async function loadCart() {
+        try {
+            const response = await fetch("/api/cart/view");
+            const table = document.getElementById("cart-table");
+            const totalElement = document.getElementById("total");
+
+            // Reset table header
+            table.innerHTML = `
+                <tr>
+                    <th>Product</th>
+                    <th>Price</th>
+                    <th>Quantity</th>
+                    <th>Subtotal</th>
+                    <th>Action</th>
+                </tr>
+            `;
+
+            // Check login
+            if (response.status === 401) {
+                alert("⚠️ Please login first!");
+                window.location.href = "login.html";
+                return;
+            }
+
+            const cartItems = await response.json();
+            let total = 0;
+
+            // Display each cart item
+            cartItems.forEach(item => {
+                const productName = item.product.productName;
+                const price = item.product.price;
+                const quantity = item.quantity;
+                const subtotal = price * quantity;
+                total += subtotal;
+
+                const row = document.createElement("tr");
+                row.innerHTML = `
+                    <td>${productName}</td>
+                    <td>$${price}</td>
+                    <td>${quantity}</td>
+                    <td>$${subtotal.toFixed(2)}</td>
+                    <td><button class="remove-btn" onclick="removeItem(${item.product.productId})">Remove</button></td>
+                `;
+                table.appendChild(row);
+            });
+
+            totalElement.textContent = "Total: $" + total.toFixed(2);
+        } catch (error) {
+            console.error("Error loading cart:", error);
+            alert("Error connecting to server.");
+        }
+    }
+
+    // ✅ Remove item from backend cart
+    async function removeItem(productId) {
+        try {
+            const response = await fetch(`/api/cart/remove/${productId}`, {
+                method: "DELETE"
+            });
+
+            const text = await response.text();
+            alert(text);
+            loadCart();
+        } catch (error) {
+            console.error("Error removing item:", error);
+            alert("Error connecting to server.");
+        }
+    }
+
+    // Load on page open
+    loadCart();
+</script>
+
+</body>
+</html>
